@@ -1,0 +1,66 @@
+[
+  {
+    "id": "303abd49-8937-4e9c-8ec9-8fdc7f9c1577",
+    "submitted_at": "2026-09-06T05:40:58.250526",
+    "raw_input": "stringstri",
+    "category": "Other",
+    "severity": "Low",
+    "root_causes": [
+      "Input error",
+      "Data corruption",
+      "Invalid format"
+    ],
+    "steps": [
+      "Verify the input string for correctness",
+      "Check for any data corruption",
+      "Review the application logs for related errors"
+    ],
+    "stakeholder_summary": "We encountered an issue with some input data that may not be formatted correctly. We are currently reviewing the data to ensure everything is in order and will resolve it promptly.",
+    "confidence_score": 0.4,
+    "error_type": "InputError",
+    "manual_triage_started_at": null,
+    "manual_triage_ended_at": null,
+    "manual_triage_time_seconds": 0,
+    "ai_triage_time_seconds": 3.732,
+    "classification_correct": null,
+    "root_cause_correct": null,
+    "recommendation_feedback": "pending",
+    "is_misleading": null,
+    "misleading_notes": null,
+    "resolution_status": "Open",
+    "manually_reviewed": false,
+    "review_notes": null
+  },
+  {
+    "id": "49ca06b8-ff98-403e-bed8-78695aaaa30e",
+    "submitted_at": "2026-09-06T05:41:05.609486",
+    "raw_input": "stringstri",
+    "category": "Other",
+    "severity": "Low",
+    "root_causes": [
+      "Input error",
+      "Data corruption",
+      "System misconfiguration"
+    ],
+    "steps": [
+      "Verify the input string for correctness",
+      "Check for data integrity issues",
+      "Review system configuration settings"
+    ],
+    "stakeholder_summary": "There was an issue with processing a string input, which may have caused minor disruptions. We are currently investigating the input and system settings to ensure everything functions smoothly.",
+    "confidence_score": 0.4,
+    "error_type": "InputError",
+    "manual_triage_started_at": null,
+    "manual_triage_ended_at": null,
+    "manual_triage_time_seconds": 0,
+    "ai_triage_time_seconds": 1.936,
+    "classification_correct": null,
+    "root_cause_correct": null,
+    "recommendation_feedback": "pending",
+    "is_misleading": null,
+    "misleading_notes": null,
+    "resolution_status": "Open",
+    "manually_reviewed": false,
+    "review_notes": null
+  }
+]
