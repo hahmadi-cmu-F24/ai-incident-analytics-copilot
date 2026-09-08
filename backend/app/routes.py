@@ -8,8 +8,10 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query
+from openai import OpenAIError
 
 from app import store
+from app.analytics import compute_summary
 from app.llm import analyse_incident
 from app.models import (
     Incident,
@@ -36,6 +38,11 @@ def submit_incident(body: SubmitIncidentRequest) -> Incident:
     """
     try:
         analysis, elapsed_seconds = analyse_incident(body.raw_input)
+    except OpenAIError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"LLM API error: {exc}",
+        )
     except ValueError as exc:
         raise HTTPException(status_code=502, detail=str(exc))
 
@@ -149,3 +156,28 @@ def update_review(incident_id: UUID, body: UpdateReviewRequest) -> Incident:
 
     incident.manually_reviewed = True
     return store.save_incident(incident)
+
+
+# ---------------------------------------------------------------------------
+# GET /api/analytics/summary — all nine metrics in one call
+# ---------------------------------------------------------------------------
+
+@router.get("/analytics/summary")
+def analytics_summary() -> dict:
+    """
+    Return aggregated metrics across all stored incidents.
+
+    Metrics included:
+      1. median_manual_triage_seconds
+      2. median_ai_triage_seconds
+      3. pct_time_reduction
+      4. classification_accuracy_pct
+      5. root_cause_accuracy_pct
+      6. recommendation_acceptance_rate_pct
+      7. avg_confidence_score
+      8. misleading_rate_pct
+      9. performance_by_severity, performance_by_category
+    Plus: volume counts, date series, category/error-type breakdowns.
+    """
+    incidents = store.list_incidents(limit=10_000)
+    return compute_summary(incidents)

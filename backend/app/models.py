@@ -15,7 +15,7 @@ All nine portfolio metrics are captured here:
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 from uuid import UUID, uuid4
@@ -81,7 +81,7 @@ class LLMAnalysis(BaseModel):
 class Incident(BaseModel):
     # Identity
     id: UUID = Field(default_factory=uuid4)
-    submitted_at: datetime = Field(default_factory=datetime.utcnow)
+    submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # Raw user input
     raw_input: str

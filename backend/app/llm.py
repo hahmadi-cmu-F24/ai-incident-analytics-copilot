@@ -14,9 +14,10 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 from pydantic import ValidationError
 
 from app.models import LLMAnalysis
@@ -86,13 +87,54 @@ Analyse the following incident input and return the JSON analysis:
 # Public function
 # ---------------------------------------------------------------------------
 
+def _extract_json(content: str) -> dict:
+    """
+    Extract a JSON object from LLM output.
+
+    Handles three cases:
+      1. Clean JSON string (ideal — GPT-4o JSON mode)
+      2. JSON wrapped in a markdown code fence  ```json ... ```
+      3. First JSON object found anywhere in the text (last-resort fallback)
+
+    Raises ValueError if no valid JSON object is found.
+    """
+    content = content.strip()
+
+    # Case 1: direct JSON
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        pass
+
+    # Case 2: markdown fenced block  ```json\n{...}\n```
+    fence_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", content, re.DOTALL)
+    if fence_match:
+        try:
+            return json.loads(fence_match.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    # Case 3: first {...} block in the response
+    brace_match = re.search(r"\{.*\}", content, re.DOTALL)
+    if brace_match:
+        try:
+            return json.loads(brace_match.group(0))
+        except json.JSONDecodeError:
+            pass
+
+    raise ValueError(
+        f"Could not extract a valid JSON object from LLM response. "
+        f"First 300 chars: {content[:300]}"
+    )
+
+
 def analyse_incident(raw_input: str) -> tuple[LLMAnalysis, float]:
     """
     Call the LLM and return (LLMAnalysis, elapsed_seconds).
 
     Raises:
-        ValueError  — if the model returns malformed JSON or a schema mismatch.
-        openai.OpenAIError — on API / network failure (let the route handle it).
+        ValueError     — malformed JSON or schema mismatch in the LLM response.
+        OpenAIError    — API / network / auth failure (caller should surface as 502).
     """
     start = time.perf_counter()
 
@@ -102,19 +144,16 @@ def analyse_incident(raw_input: str) -> tuple[LLMAnalysis, float]:
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user", "content": _USER_TEMPLATE.format(raw_input=raw_input)},
         ],
-        temperature=0.2,       # low temperature = more deterministic, consistent output
+        temperature=0.2,
         max_tokens=1024,
-        response_format={"type": "json_object"},   # GPT-4o / GPT-4o-mini enforce JSON mode
+        response_format={"type": "json_object"},
     )
 
     elapsed = time.perf_counter() - start
 
     content = response.choices[0].message.content or ""
 
-    try:
-        data = json.loads(content)
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"LLM returned non-JSON content: {content[:200]}") from exc
+    data = _extract_json(content)   # raises ValueError on failure
 
     try:
         analysis = LLMAnalysis.model_validate(data)
