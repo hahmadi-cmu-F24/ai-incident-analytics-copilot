@@ -222,6 +222,55 @@ pytest tests/ -v
 
 ---
 
+## Frontend (Day 3)
+
+### Setup
+
+```bash
+cd frontend
+
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment (optional — defaults to localhost:8000)
+cp .env.example .env
+
+# 3. Start the dev server (requires backend running on port 8000)
+npm run dev
+# → http://localhost:5173
+```
+
+The Vite dev server proxies all `/api/*` requests to the backend. No API keys in frontend code — the proxy handles routing.
+
+### Frontend screens
+
+| Screen | What it does |
+|--------|-------------|
+| **Dashboard** | KPI cards (all 9 metrics), donut charts (resolution/feedback), bar charts (category/error type), performance-by-severity table, incidents over time |
+| **Submit Incident** | Text area for log/error input, optional manual triage time, loading state, full AI analysis result card (severity, category, root causes, steps, stakeholder summary, confidence), Accept/Reject feedback buttons |
+| **Incident History** | Filterable table (severity, status, category), pagination, click row → detail modal |
+| **Detail modal** | Full analysis, raw input, status changer, feedback buttons, human review form (metrics 4, 5, 8) |
+
+### Frontend → API mapping
+
+| Action | API call |
+|--------|---------|
+| Submit form | `POST /api/incidents` |
+| Accept/Reject recommendation | `PATCH /api/incidents/{id}/feedback` |
+| View history (with filters) | `GET /api/incidents?severity=&resolution_status=&category=` |
+| Open incident detail | `GET /api/incidents/{id}` |
+| Change resolution status | `PATCH /api/incidents/{id}/status` |
+| Save human review | `PATCH /api/incidents/{id}/review` |
+| Dashboard load + 30s refresh | `GET /api/analytics/summary` |
+
+### Things to verify manually
+1. Backend must be running before starting the frontend (`uvicorn main:app --reload --port 8000` from `backend/`)
+2. If backend runs on a different port, set `VITE_API_URL=http://localhost:PORT` in `frontend/.env`
+3. After submitting an incident, the dashboard auto-refreshes every 30 seconds — you can navigate there to see updated metrics
+4. The donut chart SVG proportions look correct in your browser — no charting library is used, so verify visually
+
+---
+
 ## Project structure
 
 ```
@@ -242,8 +291,26 @@ backend/
   requirements.txt
   pytest.ini
   .env.example
+
+frontend/
+  src/
+    main.jsx           # React + QueryClient entry point
+    App.jsx            # Tab navigation shell
+    api.js             # All fetch calls — single source of truth
+    components/
+      Dashboard.jsx    # KPI cards, donut/bar charts, performance table
+      SubmitIncident.jsx  # Form + analysis result card + feedback
+      IncidentHistory.jsx # Filterable table + pagination
+      IncidentDetail.jsx  # Modal: full detail + status + feedback + review
+      shared.jsx       # Badges, spinner, empty state, format helpers
+    styles/
+      global.css       # Design tokens + all component styles
+  index.html
+  package.json
+  vite.config.js
+  .env.example
 ```
 
 ---
 
-*Day 3: React frontend (Submit + History screens). Day 4: Analytics dashboard + Docker. Day 5: Seed data + polish.*
+*Day 4: Docker Compose (single `docker compose up`). Day 5: Seed data + polish + README screenshots.*
