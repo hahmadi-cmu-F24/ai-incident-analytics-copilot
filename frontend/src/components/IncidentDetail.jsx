@@ -84,6 +84,9 @@ function ReviewForm({ incident, onSaved }) {
       return submitReview(incident.id, payload)
     },
     onSuccess: (updated) => {
+      // Keep the active query and form aligned with the API response.
+      queryClient.setQueryData(['incident', updated.id], updated)
+      setForm(initialFormState(updated))
       queryClient.invalidateQueries({ queryKey: ['incidents'] })
       queryClient.invalidateQueries({ queryKey: ['analytics'] })
       // Propagate updated incident to parent — parent will change the key,
@@ -240,6 +243,7 @@ export default function IncidentDetail({ incidentId, onClose }) {
   }, [onClose])
 
   const handleReviewSaved = (updated) => {
+    queryClient.setQueryData(['incident', incidentId], updated)
     setIncident(updated)
     // Increment reviewKey → React remounts ReviewForm with fresh useState
     // so the dropdowns immediately show the just-saved values.
