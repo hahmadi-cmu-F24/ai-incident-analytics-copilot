@@ -15,6 +15,7 @@ function AnalysisResult({ incident, onFeedbackChange }) {
   const feedbackMutation = useMutation({
     mutationFn: ({ id, feedback }) => updateFeedback(id, feedback),
     onSuccess: (updated) => {
+      queryClient.setQueryData(['incident', updated.id], updated)
       // Invalidate history and analytics so they refresh
       queryClient.invalidateQueries({ queryKey: ['incidents'] })
       queryClient.invalidateQueries({ queryKey: ['analytics'] })

@@ -100,7 +100,11 @@ class Incident(BaseModel):
     # record how long they spent triaging this incident without AI help.
     manual_triage_started_at: Optional[datetime] = None
     manual_triage_ended_at: Optional[datetime] = None
-    manual_triage_time_seconds: Optional[int] = None   # derived or supplied
+    manual_triage_time_seconds: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="Manual triage duration in seconds"
+    )   # derived or supplied
 
     # ai_triage_time_seconds: measured server-side as the wall-clock duration
     # of the LLM call (set automatically on POST /incidents).
@@ -135,6 +139,7 @@ class SubmitIncidentRequest(BaseModel):
     )
     manual_triage_time_seconds: Optional[int] = Field(
         default=None,
+        ge=0,
         description="Optional: how many seconds the user spent triaging this manually before using the AI"
     )
 
@@ -156,4 +161,4 @@ class UpdateReviewRequest(BaseModel):
     is_misleading: Optional[bool] = None
     misleading_notes: Optional[str] = None
     review_notes: Optional[str] = None
-    manual_triage_time_seconds: Optional[int] = None
+    manual_triage_time_seconds: Optional[int] = Field(default=None, ge=0)

@@ -159,9 +159,9 @@ curl http://localhost:8000/api/analytics/summary
 |----------|-------------|--------|
 | `raw_input` shorter than 10 chars | `422` | Pydantic validation error |
 | Missing request body | `422` | Pydantic validation error |
-| OpenAI API / network failure | `502` | `"LLM API error: ..."` |
-| LLM returns unparseable output | `502` | `"Could not extract a valid JSON object..."` |
-| LLM JSON doesn't match schema | `502` | `"LLM JSON did not match expected schema: ..."` |
+| OpenAI API / network failure | `502` | `"LLM analysis is currently unavailable."` |
+| LLM returns unparseable output | `502` | `"LLM analysis returned an invalid response."` |
+| LLM JSON doesn't match schema | `502` | `"LLM analysis returned an invalid response."` |
 | Unknown incident id | `404` | `"Incident not found"` |
 
 The LLM response parser handles three output formats automatically:
@@ -179,10 +179,10 @@ source .venv/bin/activate
 pytest tests/ -v
 ```
 
-**26 tests — no OpenAI key required.** All tests mock the LLM and use a temp data file isolated per test. Coverage:
+**48 tests — no OpenAI key required.** All tests mock the LLM and use a temp data file isolated per test. Coverage:
 - Successful submission → all fields populated
 - Input validation (too short, missing body)
-- OpenAI API error → 502 with readable message
+- OpenAI API error → 502 with a safe generic message
 - Malformed LLM output → 502 with readable message
 - Persistence (submitted incident appears in list + fetchable by id)
 - Analytics: empty store, all 9 metric keys present, correct aggregation with known data

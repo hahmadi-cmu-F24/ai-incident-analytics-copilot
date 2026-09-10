@@ -220,6 +220,7 @@ export default function IncidentDetail({ incidentId, onClose }) {
   const statusMutation = useMutation({
     mutationFn: (status) => updateStatus(incidentId, status),
     onSuccess: (updated) => {
+      queryClient.setQueryData(['incident', incidentId], updated)
       setIncident(updated)
       queryClient.invalidateQueries({ queryKey: ['incidents'] })
       queryClient.invalidateQueries({ queryKey: ['analytics'] })
@@ -229,6 +230,7 @@ export default function IncidentDetail({ incidentId, onClose }) {
   const feedbackMutation = useMutation({
     mutationFn: (fb) => updateFeedback(incidentId, fb),
     onSuccess: (updated) => {
+      queryClient.setQueryData(['incident', incidentId], updated)
       setIncident(updated)
       queryClient.invalidateQueries({ queryKey: ['incidents'] })
       queryClient.invalidateQueries({ queryKey: ['analytics'] })

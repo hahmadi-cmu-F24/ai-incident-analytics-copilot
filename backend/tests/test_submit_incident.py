@@ -69,10 +69,17 @@ def test_submit_incident_success(client: TestClient, mock_llm) -> None:
 
 
 def test_submit_incident_without_manual_time(client: TestClient, mock_llm) -> None:
-    """manual_triage_time_seconds is optional — omitting it is fine."""
+    """manual_triage_time_seconds is optional and accepts zero."""
     resp = client.post("/api/incidents", json={"raw_input": "Out of memory error in pod worker-1"})
     assert resp.status_code == 201
     assert resp.json()["manual_triage_time_seconds"] is None
+
+    zero_resp = client.post(
+        "/api/incidents",
+        json={"raw_input": "Out of memory error in pod worker-2", "manual_triage_time_seconds": 0},
+    )
+    assert zero_resp.status_code == 201
+    assert zero_resp.json()["manual_triage_time_seconds"] == 0
 
 
 # ---------------------------------------------------------------------------
@@ -84,6 +91,16 @@ def test_submit_incident_input_too_short(client: TestClient, mock_llm) -> None:
     resp = client.post("/api/incidents", json={"raw_input": "err"})
     assert resp.status_code == 422
     # LLM should never have been called
+    mock_llm.assert_not_called()
+
+    negative_resp = client.post(
+        "/api/incidents",
+        json={
+            "raw_input": "Database connection refused on port 5432",
+            "manual_triage_time_seconds": -1,
+        },
+    )
+    assert negative_resp.status_code == 422
     mock_llm.assert_not_called()
 
 
@@ -111,7 +128,8 @@ def test_submit_incident_openai_error(client: TestClient, monkeypatch) -> None:
         )
 
     assert resp.status_code == 502
-    assert "LLM API error" in resp.json()["detail"]
+    assert resp.json()["detail"] == "LLM analysis is currently unavailable."
+    assert "APIConnectionError" not in resp.json()["detail"]
 
 
 def test_submit_incident_malformed_json(client: TestClient, monkeypatch) -> None:

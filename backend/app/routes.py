@@ -4,6 +4,7 @@ FastAPI routes for incident management and analytics.
 
 from __future__ import annotations
 
+import logging
 from typing import Optional
 from uuid import UUID
 
@@ -22,6 +23,7 @@ from app.models import (
 )
 
 router = APIRouter(prefix="/api")
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -39,12 +41,11 @@ def submit_incident(body: SubmitIncidentRequest) -> Incident:
     try:
         analysis, elapsed_seconds = analyse_incident(body.raw_input)
     except OpenAIError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"LLM API error: {exc}",
-        )
+        logger.exception("LLM provider error while analysing incident")
+        raise HTTPException(status_code=502, detail="LLM analysis is currently unavailable.") from exc
     except ValueError as exc:
-        raise HTTPException(status_code=502, detail=str(exc))
+        logger.exception("Invalid LLM analysis response")
+        raise HTTPException(status_code=502, detail="LLM analysis returned an invalid response.") from exc
 
     incident = Incident(
         raw_input=body.raw_input,

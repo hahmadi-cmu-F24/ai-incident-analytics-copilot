@@ -118,6 +118,17 @@ class TestReviewEndpoint:
         assert resp.status_code == 200
         assert resp.json()["manual_triage_time_seconds"] == 720
 
+        zero_resp = client.patch(f"/api/incidents/{inc['id']}/review", json={
+            "manual_triage_time_seconds": 0,
+        })
+        assert zero_resp.status_code == 200
+        assert zero_resp.json()["manual_triage_time_seconds"] == 0
+
+        negative_resp = client.patch(f"/api/incidents/{inc['id']}/review", json={
+            "manual_triage_time_seconds": -1,
+        })
+        assert negative_resp.status_code == 422
+
     def test_review_notes_persisted(self, client: TestClient, mock_llm) -> None:
         inc = _create_incident(client, mock_llm)
         resp = client.patch(f"/api/incidents/{inc['id']}/review", json={
