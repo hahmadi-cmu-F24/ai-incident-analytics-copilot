@@ -100,19 +100,19 @@ analysis, original input, feedback, resolution status, and human review.
 
 ### Analytics Dashboard
 
-![Analytics Dashboard](docs/screenshots/dashboard.png)
+<img width="1341" height="704" alt="Screenshot 2026-09-10 at 5 10 12 PM" src="https://github.com/user-attachments/assets/bad9d5a7-99b7-40a6-88f3-bbcb6d0afe1c" />
 
 ### Submit Incident
 
-![Submit Incident](docs/screenshots/submit-incident.png)
+<img width="1367" height="451" alt="Screenshot 2026-09-10 at 5 11 26 PM" src="https://github.com/user-attachments/assets/e5761318-09fb-49dc-a7a3-d79e2826e94a" />
 
 ### Incident Detail & Human Review
 
-![Incident Detail](docs/screenshots/incident-detail.png)
+<img width="389" height="641" alt="Screenshot 2026-09-10 at 5 12 21 PM" src="https://github.com/user-attachments/assets/5a80c2fe-f4a0-4549-901a-c12b0979c516" />
 
 ### Incident History
 
-![Incident History](docs/screenshots/incident-history.png)
+<img width="883" height="280" alt="Screenshot 2026-09-10 at 5 12 42 PM" src="https://github.com/user-attachments/assets/4e7ecf83-248c-4552-8c7a-6a46a7a199f6" />
 
 ## Architecture
 
