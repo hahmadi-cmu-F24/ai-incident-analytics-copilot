@@ -100,19 +100,19 @@ analysis, original input, feedback, resolution status, and human review.
 
 ### Analytics Dashboard
 
-![Analytics Dashboard](docs/screenshots/dashboard.png)
+![Analytics Dashboard](docs/dashboard.png)
 
 ### Submit Incident
 
-![Analytics Dashboard](docs/screenshots/submit-incident.png)
+![Analytics Dashboard](docs/submit-incident.png)
 
 ### Incident Detail & Human Review
 
-![Analytics Dashboard](docs/screenshots/incident-detail.png)
+![Analytics Dashboard](docs/incident-detail.png)
 
 ### Incident History
 
-![Analytics Dashboard](docs/screenshots/incident-history.png)
+![Analytics Dashboard](docs/incident-history.png)
 
 ## Architecture
 
