@@ -17,6 +17,9 @@ The application also provides a human-in-the-loop review workflow and an
 analytics dashboard for evaluating AI recommendations across nine operational
 metrics.
 
+## 🎥 Demo
+https://youtu.be/GCchQkOnWgg
+
 ## Overview
 
 Incident triage often requires engineers to interpret error messages,
